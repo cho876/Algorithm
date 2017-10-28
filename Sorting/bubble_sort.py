@@ -5,10 +5,14 @@ def swap(arr, first, second):
 
 
 def bubble_sort(argv):
+    isSorting = True
     for index in reversed(range(len(argv))):
         for i in range(index):
             if argv[i] > argv[i + 1]:  # 두번째 인자가 첫번째 인자보다 클 경우 Swapping
                 swap(argv, i, i + 1)
+                isSorting = False
+        if (isSorting):
+            break
     return argv
 
 
