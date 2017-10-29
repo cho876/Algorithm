@@ -140,7 +140,7 @@ void split_main(int *array, int start, int end) {
 }
 
 /**
- Function: thread
+ Function: Divide Thread & Sorting Thread's array & Rejoin them
 
  param: Array
  */
