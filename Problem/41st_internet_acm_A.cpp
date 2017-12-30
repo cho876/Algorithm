@@ -1,8 +1,9 @@
-/**
+﻿/**
 	The 41st Annual ACM
-		Asia Regional-Daejeon
-		Nationwide Internet Competition
-		Probelm A (Binary truee)
+	Asia Regional-Daejeon
+	Nationwide Internet Competition
+
+	Probelm A (Binary truee)
 */
 
 #include <iostream>
@@ -10,53 +11,86 @@
 
 using namespace std;
 
-
 struct Node {
-	int value;
-	int leftSum;
+	int leftChild;
+	int rightChild;
+	int leftWeight;
+	int rightWeight;
 };
+
+int countRecur(Node* tree, int index, int &dist);
 
 int main()
 {
-	int max = 0;   // Sum of node's values
-
 	int height;
 	cin >> height;
-	int total_nodes = pow(2, height + 1) - 2 + 1;  // Total number of nodes
 
-	Node* node = new Node[total_nodes];
-	node[0].value = 0;
-	node[0].leftSum = 0;
+	int total_nodes = pow(2, height + 1) - 1;  // Total number of nodes by height
+	int parents = total_nodes / 2;  // The number of nodes that have all children
 
-	for (int i = 1; i < total_nodes; i++) {  // Enter a value for each node
-		cin >> node[i].value;
-		node[i].leftSum = 0;
-	}
+	Node* tree = new Node[parents];
 
-	for (int i = (total_nodes - 1); i > 0; i = i - 2) {
-		if (i >= total_nodes / 2) {   // If the nodes are the lowermost nodes
-			if (node[i].value != node[i - 1].value) {   // If the two values are different, the larger number is matched.
-				if (node[i].value > node[i - 1].value)
-					node[i - 1].value = node[i].value;
-				else
-					node[i].value = node[i - 1].value;
-			}
-			node[(i - 1) / 2].leftSum = node[i - 1].value;
+	int lw, rw;
+	for (int i = 0; i < parents; i++) {
+		cin >> lw >> rw;
+		tree[i].leftWeight = lw;
+		tree[i].rightWeight = rw;
+		
+		int ln = (i * 2) + 1;
+		int rn = ln + 1;
+		if (ln>=parents) {  // 	When entering the lowest node, both child nodes are stored as 0
+			tree[i].leftChild = 0;
+			tree[i].rightChild = 0;
 		}
-		else {    // If the nodes are other than the lowermost node
-			int left = node[i - 1].value + node[i - 1].leftSum;
-			int right = node[i].value + node[i].leftSum;
-			if (right != left) {  // If the two values are different, the value of the current node and the sum of the previous nodes are matched to the larger one.
-				if (right > left)
-					node[i - 1].value = (node[i].value + node[i].leftSum) - node[i - 1].leftSum;
-				else
-					node[i].value = (node[i - 1].value + node[i - 1].leftSum) - node[i].leftSum;
-			}
-			node[(i - 1) / 2].leftSum = node[i - 1].value + node[i - 1].leftSum;
+		else {
+			tree[i].leftChild = ln;
+			tree[i].rightChild = rn;
 		}
-		max += node[i].value;
-		max += node[i - 1].value;
 	}
-	cout << max << endl;
+	
+	int dist = 0;
+	cout << countRecur(tree, 0, dist) << endl;
 	return 0;
+
+}
+
+/**
+	Minimum sum return function through recursive method
+
+*/
+int countRecur(Node* tree, int index, int &dist)
+{
+	if (tree[index].leftChild == 0 && tree[index].rightChild == 0) {
+		if (tree[index].leftWeight >= tree[index].rightWeight) {
+			dist = tree[index].leftWeight;
+			return tree[index].leftWeight * 2;
+		}
+		else {
+			dist = tree[index].rightWeight;
+			return tree[index].rightWeight * 2;
+		}
+	}
+	else {
+		int lChild = tree[index].leftChild;
+		int rChild = tree[index].rightChild;
+
+		int lDist = 0;
+		int lweightSum = countRecur(tree, lChild, lDist) + tree[index].leftWeight;
+		lDist += tree[index].leftWeight;
+		
+		int rDist = 0;
+		int rweightSum = countRecur(tree, rChild, rDist) + tree[index].rightWeight;
+		rDist += tree[index].rightWeight;
+		
+		int diff;
+		if (lDist >= rDist) {
+			diff = lDist - rDist;
+			dist = lDist;
+		}
+		else {
+			diff = rDist - lDist;
+			dist = rDist;
+		}
+		return lweightSum + rweightSum + diff;
+	}
 }
