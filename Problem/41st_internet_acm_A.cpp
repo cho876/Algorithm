@@ -1,96 +1,71 @@
-﻿/**
-	The 41st Annual ACM
-	Asia Regional-Daejeon
-	Nationwide Internet Competition
-
-	Probelm A (Binary truee)
-*/
-
-#include <iostream>
+﻿#include <iostream>
+#include <vector>
+#include <algorithm>
 #include <math.h>
 
 using namespace std;
 
 struct Node {
-	int leftChild;
-	int rightChild;
-	int leftWeight;
-	int rightWeight;
+	int left_weight;
+	int right_weight;
 };
 
-int countRecur(Node* tree, int index, int &dist);
+int recurCount(Node* tree, int index, int limit, int& sum);
 
 int main()
 {
 	int height;
 	cin >> height;
 
-	int total_nodes = pow(2, height + 1) - 1;  // Total number of nodes by height
-	int parents = total_nodes / 2;  // The number of nodes that have all children
+	int total_nodes = pow(2, height + 1) - 1;
+	int limit = total_nodes / 2;
 
-	Node* tree = new Node[parents];
+	Node* arr_node = new Node[limit];
 
-	int lw, rw;
-	for (int i = 0; i < parents; i++) {
-		cin >> lw >> rw;
-		tree[i].leftWeight = lw;
-		tree[i].rightWeight = rw;
-		
-		int ln = (i * 2) + 1;
-		int rn = ln + 1;
-		if (ln>=parents) {  // 	When entering the lowest node, both child nodes are stored as 0
-			tree[i].leftChild = 0;
-			tree[i].rightChild = 0;
-		}
-		else {
-			tree[i].leftChild = ln;
-			tree[i].rightChild = rn;
-		}
+	Node node;
+	int tmp_left, tmp_right;
+	for (int i = 0; i < limit; i++){
+		cin >> tmp_left >> tmp_right;
+		node.left_weight = tmp_left;
+		node.right_weight = tmp_right;
+		arr_node[i] = node;
 	}
 	
-	int dist = 0;
-	cout << countRecur(tree, 0, dist) << endl;
-	return 0;
+	int sum = 0;
 
+	recurCount(arr_node, 0, (limit/2), sum);
+	cout << sum << endl;
 }
 
-/**
-	Minimum sum return function through recursive method
-
-*/
-int countRecur(Node* tree, int index, int &dist)
-{
-	if (tree[index].leftChild == 0 && tree[index].rightChild == 0) {
-		if (tree[index].leftWeight >= tree[index].rightWeight) {
-			dist = tree[index].leftWeight;
-			return tree[index].leftWeight * 2;
+int recurCount(Node* tree, int index, int limit, int& sum) {
+	if (index >= limit) {
+		if (tree[index].left_weight > tree[index].right_weight) {
+			sum += (tree[index].left_weight * 2);
+			return tree[index].left_weight;
 		}
 		else {
-			dist = tree[index].rightWeight;
-			return tree[index].rightWeight * 2;
+			sum += (tree[index].right_weight * 2);
+			return tree[index].right_weight;
 		}
 	}
 	else {
-		int lChild = tree[index].leftChild;
-		int rChild = tree[index].rightChild;
+		int left_node = (2 * index) + 1;
+		int right_node = left_node + 1;
 
-		int lDist = 0;
-		int lweightSum = countRecur(tree, lChild, lDist) + tree[index].leftWeight;
-		lDist += tree[index].leftWeight;
-		
-		int rDist = 0;
-		int rweightSum = countRecur(tree, rChild, rDist) + tree[index].rightWeight;
-		rDist += tree[index].rightWeight;
-		
-		int diff;
-		if (lDist >= rDist) {
-			diff = lDist - rDist;
-			dist = lDist;
+		int left_max = recurCount(tree, left_node, limit, sum);
+		int right_max = recurCount(tree, right_node, limit, sum);
+
+		if (left_max + tree[index].left_weight > right_max + tree[index].right_weight) {
+			tree[index].right_weight = left_max + tree[index].left_weight - right_max;
+			sum += (tree[index].left_weight + tree[index].right_weight);
+
+			return left_max + tree[index].left_weight;
 		}
 		else {
-			diff = rDist - lDist;
-			dist = rDist;
+			tree[index].left_weight = right_max + tree[index].right_weight - left_max;
+			sum += (tree[index].left_weight + tree[index].right_weight);
+
+			return right_max + tree[index].right_weight;
 		}
-		return lweightSum + rweightSum + diff;
 	}
 }
