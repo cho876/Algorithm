@@ -9,7 +9,12 @@ struct Info {
 	int end;
 };
 
-bool cmp_sort(Info a, Info b) { return a.end < b.end; }
+bool cmp_sort(Info a, Info b) { 
+	if (a.end == b.end)
+		return a.start < b.start;
+	else
+		return a.end < b.end;
+}
 
 int main()
 {
@@ -29,14 +34,16 @@ int main()
 	sort(v_meet.begin(), v_meet.end(), cmp_sort);
 
 	int result = 0;
-	int start_point = -99999;
+	int start_point = 0;
 
 	for (int i = 0; i < v_meet.size(); i++) {
 		if (start_point <= v_meet[i].start) {
-			result++;
 			start_point = v_meet[i].end;
+			result++;
 		}
 	}
 
 	cout << result << endl;
+
+	return 0;
 }
