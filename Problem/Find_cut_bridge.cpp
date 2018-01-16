@@ -7,6 +7,8 @@ using namespace std;
 void addEdges(vector<int>*& v_adj, int size);
 void DFS(vector<int>*& v_adj, int index, bool*& isVisited, int*& parent, int*& dfsNum, int*& low);
 
+int time = 0;
+
 int main() {
 
 	int nodes, edges;
@@ -33,7 +35,7 @@ int main() {
 
 void DFS(vector<int>*& v_adj, int index, bool*& isVisited, int*& parent, int*& dfsNum, int*& low) {
 	isVisited[index] = true;
-	dfsNum[index] = low[index] = index;
+	dfsNum[index] = low[index] = time++;
 
 	int nextNode;
 	for (int i = 0; i < v_adj[index].size(); i++) {
