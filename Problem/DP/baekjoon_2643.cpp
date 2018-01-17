@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <cstdio>
 #include <vector>
 #include <algorithm>
 
@@ -6,7 +7,7 @@ using namespace std;
 
 bool cmp_sort(pair<int, int> p1, pair<int, int> p2) {
 	if (p1.first == p2.first)
-		return p1.second > p2.second;
+		return  p1.second > p2.second;
 
 	return p1.first > p2.first;
 }
@@ -15,11 +16,8 @@ int main()
 {
 	int papers;
 	scanf("%d", &papers);
-
 	vector<pair<int, int> > v_paper;
 	v_paper.resize(papers);
-	vector<int> v_result;
-	v_result.resize(papers);
 
 	int row, col;
 	for (int i = 0; i < papers; i++) {
@@ -30,11 +28,13 @@ int main()
 
 	sort(v_paper.begin(), v_paper.end(), cmp_sort);
 
-	int ans = -99999;
-	
-	for (int i = 0; i < v_result.size(); i++) {    // Base
+	vector<int> v_result;
+	v_result.resize(papers);
+
+	int ans = 0;
+	for (int i = 0; i < v_paper.size(); i++) {  // Base
 		for (int j = 0; j < i; j++) {
-			if (v_paper[i].first <= v_paper[j].first && v_paper[i].second <= v_paper[j].second) 
+			if (v_paper[i].first <= v_paper[j].first && v_paper[i].second <= v_paper[j].second)
 				v_result[i] = max(v_result[i], v_result[j]);
 		}
 		v_result[i]++;
