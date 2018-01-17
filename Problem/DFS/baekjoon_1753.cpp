@@ -1,73 +1,68 @@
-﻿#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <iostream>
+#include <cstdio>
 #include <queue>
+#include <vector>
 
-#define INF 99999999
+#define INF 999999
 
 using namespace std;
 
-void Dijkstra(vector<pair<int, int> >* v_list, int src, int size, vector<int>& v_result);
+void Dijkstra(vector<pair<int, int> >* v_pair, int src, int size);
 
 int main()
 {
 	int nodes, edges;
-	cin >> nodes >> edges;
+	scanf("%d%d", &nodes, &edges);
+	vector<pair<int, int> >* v_pair = new vector<pair<int, int> >[nodes];
 
 	int src;
-	cin >> src;
-	
-	vector<pair<int, int> >* v_list = new vector<pair<int, int> >[nodes];
-	
+	scanf("%d", &src);
+
 	int from, to, weight;
 	for (int i = 0; i < edges; i++) {
-		cin >> from >> to >> weight;
-		v_list[from - 1].push_back(make_pair(to - 1, weight));
+		scanf("%d%d%d", &from, &to, &weight);
+		v_pair[from - 1].push_back(make_pair(to - 1, weight));
 	}
 
-	vector<int> v_result;
-	Dijkstra(v_list, src-1, nodes, v_result);
 
-	for (int i = 0; i < v_result.size(); i++) {
-		if (v_result[i] == INF)
-			cout << "INF" << endl;
-		else
-			cout << v_result[i] << endl;
-	}
+	Dijkstra(v_pair, src - 1, nodes);
 
 	return 0;
 }
 
-void Dijkstra(vector<pair<int, int> >* v_list, int src, int size, vector<int>& v_result) {
+void Dijkstra(vector<pair<int, int> >* v_pair, int src, int size) {
 	vector<int> v_dist;
-	for (int i = 0; i < size; i++)
-		v_dist.push_back(INF);
+	v_dist.resize(size);
 
+	for (int i = 0; i < size; i++)
+		v_dist[i] = INF;
 	v_dist[src] = 0;
 
-	priority_queue < pair<int,int>, vector<pair<int, int> >, less<pair<int, int> > > q_list;
+	queue<pair<int, int> > q_list;
 	q_list.push(make_pair(src, 0));
 
-	int curSrc, curDist;
+	int curNode, curDist;
 	while (!q_list.empty()) {
-		curSrc = q_list.top().first;
-		curDist = q_list.top().second;
+		curNode = q_list.front().first;
+		curDist = q_list.front().second;
 		q_list.pop();
 
-		if (v_dist[curSrc] < curDist)
-			continue;
+		int nextNode, nextDist;
+		for (int i = 0; i < v_pair[curNode].size(); i++) {
+			nextNode = v_pair[curNode][i].first;
+			nextDist = curDist + v_pair[curNode][i].second;
 
-		int nextSrc, nextDist;
-		for (int i = 0; i < v_list[curSrc].size(); i++) {
-			nextSrc = v_list[curSrc][i].first;
-			nextDist = curDist + v_list[curSrc][i].second;
-
-			if (v_dist[nextSrc] > nextDist) {
-				v_dist[nextSrc] = nextDist;
-				q_list.push(make_pair(nextSrc, nextDist));
+			if (v_dist[nextNode] > nextDist) {
+				v_dist[nextNode] = nextDist;
+				q_list.push(make_pair(nextNode, nextDist));
 			}
 		}
 	}
 
-	v_result = v_dist;
+	for (int i = 0; i < v_dist.size(); i++) {
+		if (v_dist[i] == INF)
+			printf("INF\n");
+		else
+			printf("%d\n", v_dist[i]);
+	}
 }
