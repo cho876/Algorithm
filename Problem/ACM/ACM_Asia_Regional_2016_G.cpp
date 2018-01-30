@@ -1,120 +1,76 @@
-﻿#include <iostream>
+#include <iostream>
+#include <cstdio>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
-struct Point {
-	int row;
-	int col;
-};
+bool isInRange(int curRow, int curCol, int nextRow, int nextCol);
 
-class Maze {
-private:
-	int** map;
-	bool** isVisited;
-	int mapCol;
-	int mapRow;
-
-public:
-	void createMap(int mapRow, int mapCol);
-	bool pathExist(Point src, Point dst);
-	bool pathExistRecur(Point curSrc, Point dst);
-};
-
-
-void Maze::createMap(int mapRow, int mapCol) {
-	this->mapRow = mapRow;
-	this->mapCol = mapCol;
-
-	map = new int*[mapRow];
-	isVisited = new bool*[mapRow];
-
-	for (int i = 0; i < mapRow; i++) {
-		map[i] = new int[mapCol];
-		isVisited[i] = new bool[mapCol];
-	}
-
-	char input;
-	for (int i = 0; i < mapRow; i++) {
-		for (int j = 0; j < mapCol; j++) {
-			cin >> input;
-			int parse_int = input - 48;
-			map[i][j] = parse_int;
-			isVisited[i][j] = false;
-		}
-	}
-}
-
-bool Maze::pathExist(Point src, Point dst) {
-	if (map[src.row][src.col] == 1)
-		return false;
-	else
-		return pathExistRecur(src, dst);
-}
-
-bool Maze::pathExistRecur(Point curSrc, Point dst) {
-	if (curSrc.row == dst.row)
-		return true;
-
-	else {
-		isVisited[curSrc.row][curSrc.col] = true;
-		Point curSpot;
-
-		if (curSrc.row + 1 < mapRow) {    // Bottom
-			if (map[curSrc.row + 1][curSrc.col] == 0 && isVisited[curSrc.row + 1][curSrc.col] == false) {
-				curSpot.row = curSrc.row + 1;
-				curSpot.col = curSrc.col;
-				if (pathExistRecur(curSpot, dst))
-					return true;
-			}
-		}
-		if (curSrc.col + 1 < mapCol) {   // Right
-			if (map[curSrc.row][curSrc.col + 1] == 0 && isVisited[curSrc.row][curSrc.col + 1] == false) {
-				curSpot.row = curSrc.row;
-				curSpot.col = curSrc.col + 1;
-				if (pathExistRecur(curSpot, dst))
-					return true;
-			}
-		}
-		if (curSrc.col - 1 >= 0) {   // Left
-			if (map[curSrc.row][curSrc.col - 1] == 0 && isVisited[curSrc.row][curSrc.col - 1] == false) {
-				curSpot.row = curSrc.row;
-				curSpot.col = curSrc.col - 1;
-				if (pathExistRecur(curSpot, dst))
-					return true;
-			}
-		}
-		if (curSrc.row - 1 >= 0) {   // Top
-			if (map[curSrc.row - 1][curSrc.col] == 0 && isVisited[curSrc.row - 1][curSrc.col] == false) {
-				curSpot.row = curSrc.row - 1;
-				curSpot.col = curSrc.col;
-				if (pathExistRecur(curSpot, dst))
-					return true;
-			}
-		}
-		return false;
-	}
-}
+int dx[4] = { -1,1,0,0 };
+int dy[4] = { 0,0,1,-1 };
 
 int main() {
-	Maze maze;
-	Point src;
-	Point dst;
+	int row, col;
+	scanf("%d%d", &row, &col);
+	vector<int>* map = new vector<int>[row];
 
-	int mapRow, mapCol;
-	cin >> mapRow >> mapCol;
-	
-	src.row = 0;
-	dst.row = mapRow - 1;
-
-	maze.createMap(mapRow, mapCol);
-
-	for (int i = 0; i < mapCol; i++) {
-		src.col = i;
-		if (maze.pathExist(src, dst)) {
-			cout << "YES" << endl;
-			return 0;
+	char index;
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++) {
+			cin >> index;
+			map[i].push_back(index - '0');
 		}
 	}
-	cout << "NO" << endl;
+
+	bool** isVisited = new bool*[row];
+	for (int i = 0; i < row; i++) 
+		isVisited[i] = new bool[col];
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			isVisited[i][j] = false;
+	}
+
+	for (int i = 0; i < col; i++) {
+		priority_queue<pair<int,int> > path;
+		path.push(make_pair(0, i));
+
+		int curRow, curCol, nextRow, nextCol;
+		while (!path.empty()) {
+			curRow = path.top().first;
+			curCol = path.top().second;
+			path.pop();
+
+			if (!isInRange(curRow, curCol, row, col) || map[curRow][curCol] == 1)
+				continue;
+
+			if (isVisited[curRow][curCol])
+				continue;
+
+			isVisited[curRow][curCol] = true;
+
+			if (curRow == row - 1) {
+				printf("YES\n");
+				return 0;
+			}
+			for (int i = 0; i < 4; i++) {
+				nextRow = curRow + dy[i];
+				nextCol = curCol + dx[i];
+
+				if (!isInRange(nextRow, nextCol, row, col))
+					continue;
+
+				path.push(make_pair(nextRow, nextCol));
+			}
+		}
+	}
+	printf("NO\n");
 	return 0;
+}
+
+bool isInRange(int curRow, int curCol, int mapRow, int mapCol) {
+	if (curRow >= mapRow || curRow < 0 || curCol >= mapCol || curCol < 0)
+		return false;
+	return true;
 }
