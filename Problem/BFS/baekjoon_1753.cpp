@@ -1,68 +1,77 @@
 #include <iostream>
 #include <cstdio>
-#include <queue>
 #include <vector>
+#include <queue>
+#include <functional>
 
-#define INF 999999
+#define INF 99999999
 
 using namespace std;
 
-void Dijkstra(vector<pair<int, int> >* v_pair, int src, int size);
+void Dijkstra(vector<pair<int, int> >* v_adj, bool*& isVisited, int size, int src);
 
-int main()
-{
-	int nodes, edges;
-	scanf("%d%d", &nodes, &edges);
-	vector<pair<int, int> >* v_pair = new vector<pair<int, int> >[nodes];
 
-	int src;
-	scanf("%d", &src);
+int main() {
+	int nodes, edges, src;
+	scanf("%d%d%d", &nodes, &edges, &src);
+	vector<pair<int, int> >* v_adj = new vector<pair<int, int> >[nodes];
 
 	int from, to, weight;
 	for (int i = 0; i < edges; i++) {
 		scanf("%d%d%d", &from, &to, &weight);
-		v_pair[from - 1].push_back(make_pair(to - 1, weight));
+		v_adj[from - 1].push_back(make_pair(to - 1, weight));
 	}
 
+	bool* isVisited = new bool[nodes];
+	for (int i = 0; i < nodes; i++)
+		isVisited[i] = false;
 
-	Dijkstra(v_pair, src - 1, nodes);
+	Dijkstra(v_adj, isVisited, nodes, src-1);
 
 	return 0;
 }
 
-void Dijkstra(vector<pair<int, int> >* v_pair, int src, int size) {
-	vector<int> v_dist;
-	v_dist.resize(size);
+void Dijkstra(vector<pair<int, int> >* v_adj, bool*& isVisited, int size, int src) {
+	vector<int> dist;
+	dist.resize(size);
 
 	for (int i = 0; i < size; i++)
-		v_dist[i] = INF;
-	v_dist[src] = 0;
+		dist[i] = INF;
 
-	queue<pair<int, int> > q_list;
-	q_list.push(make_pair(src, 0));
+	dist[src] = 0;
 
-	int curNode, curDist;
-	while (!q_list.empty()) {
-		curNode = q_list.front().first;
-		curDist = q_list.front().second;
-		q_list.pop();
+	priority_queue<pair<int, int>, vector<pair<int, int> >, greater<pair<int, int> > > path;
+	path.push(make_pair(0, src));
 
-		int nextNode, nextDist;
-		for (int i = 0; i < v_pair[curNode].size(); i++) {
-			nextNode = v_pair[curNode][i].first;
-			nextDist = curDist + v_pair[curNode][i].second;
+	int curNode, curWeight, nextNode, nextWeight;
+	while (!path.empty()) {
+		curWeight = path.top().first;
+		curNode = path.top().second;
+		path.pop();
 
-			if (v_dist[nextNode] > nextDist) {
-				v_dist[nextNode] = nextDist;
-				q_list.push(make_pair(nextNode, nextDist));
+		// cout << curNode << ", " << curWeight << endl;
+
+		isVisited[curNode] = true;
+
+		for (int i = 0; i < v_adj[curNode].size(); i++) {
+			nextNode = v_adj[curNode][i].first;
+			nextWeight = curWeight + v_adj[curNode][i].second;
+
+			if (isVisited[nextNode])
+				continue;
+
+			if (dist[nextNode] > nextWeight) {
+				dist[nextNode] = nextWeight;
+				path.push(make_pair(nextWeight, nextNode));
 			}
 		}
 	}
 
-	for (int i = 0; i < v_dist.size(); i++) {
-		if (v_dist[i] == INF)
+	for (int i = 0; i < size; i++) {
+		if (dist[i] == INF)
 			printf("INF\n");
 		else
-			printf("%d\n", v_dist[i]);
+			printf("%d\n", dist[i]);
 	}
+	return;
 }
