@@ -1,47 +1,71 @@
-﻿#include <iostream>
+#include <iostream>
+#include <cstdio>
 #include <vector>
 #include <algorithm>
 
 using namespace std;
 
-bool cmp_sort(pair<int, int> p1, pair<int, int> p2) {
-	if (p1.first == p2.first)
-		return p1.second > p2.second;
+void DFS(vector<int>* v_adj, bool*& result, int index, bool*& isVisited, int*& parent, int*& low, int*& dfsNum);
 
-	return p1.first > p2.first;
-}
+int main() {
+	int nodes, edges;
+	scanf("%d%d", &nodes, &edges);
+	vector<int>* v_adj = new vector<int>[nodes];
 
-int main()
-{
-	int papers;
-	scanf("%d", &papers);
-
-	vector<pair<int, int> > v_paper;
-	v_paper.resize(papers);
-	vector<int> v_result;
-	v_result.resize(papers);
-
-	int row, col;
-	for (int i = 0; i < papers; i++) {
-		scanf("%d%d", &row, &col);
-		v_paper[i].first = max(row, col);
-		v_paper[i].second = min(row, col);
+	int from, to;
+	for (int i = 0; i < edges; i++) {
+		scanf("%d%d", &from, &to);
+		v_adj[from - 1].push_back(to - 1);
+		v_adj[to - 1].push_back(from - 1);
 	}
 
-	sort(v_paper.begin(), v_paper.end(), cmp_sort);
+	bool* isVisited = new bool[nodes];
+	bool* result = new bool[nodes];
+	int* parent = new int[nodes];
+	int* low = new int[nodes];
+	int* dfsNum = new int[nodes];
 
-	int ans = -99999;
-	
-	for (int i = 0; i < v_result.size(); i++) {    // Base
-		for (int j = 0; j < i; j++) {
-			if (v_paper[i].first <= v_paper[j].first && v_paper[i].second <= v_paper[j].second) 
-				v_result[i] = max(v_result[i], v_result[j]);
-		}
-		v_result[i]++;
-		ans = max(ans, v_result[i]);
+	for (int i = 0; i < nodes; i++) {
+		isVisited[i] = false;
+		result[i] = false;
+		parent[i] = -1;
 	}
 
-	printf("%d\n", ans);
+	DFS(v_adj, result, 0, isVisited, parent, low, dfsNum);
+
+	for (int i = 0; i < nodes; i++)
+		if (result[i])
+			printf("%d ", i+1);
+	printf("\n");
 
 	return 0;
+}
+
+void DFS(vector<int>* v_adj,bool*& result, int index, bool*& isVisited, int*& parent, int*& low, int*& dfsNum) {
+	static int time = 0;
+	int children = 0;
+
+	isVisited[index] = true;
+	low[index] = dfsNum[index] = ++time;
+
+	int nextNode;
+	for (int i = 0; i < v_adj[index].size(); i++) {
+		nextNode = v_adj[index][i];
+		if (!isVisited[nextNode]) {
+			children++;
+			parent[nextNode] = index;
+			DFS(v_adj, result, nextNode, isVisited, parent, low, dfsNum);
+
+			low[index] = min(low[index], low[nextNode]);
+
+			if (parent[index] == -1 && children > 1)
+				result[index] = true;
+
+			if (parent[index] != -1 &&low[nextNode] >= dfsNum[index]) 
+				result[index] = true;
+
+		}
+		else if (parent[index] != nextNode)
+			low[index] = min(low[index], dfsNum[nextNode]);
+	}
 }
