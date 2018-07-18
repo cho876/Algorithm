@@ -1,57 +1,74 @@
+/**
+	Test Case
+
+	1S2D*3T
+	1D2S#10S
+	1D2S0T
+	1S*2T*3S
+	1D#2S*3S
+	1T2D3D#
+	1D2S3T*
+*/
+
 #include <iostream>
 #include <cstdio>
-#include <stack>
-#include <string>
 #include <cstring>
+#include <string>
 #include <algorithm>
+#include <stack>
 
 using namespace std;
 
-int strSize = 0;
 stack<int> stk;
 
-void strToken(char* str) {
-	int tmp = 0;
-	int pre = 0;
-	for (int i = 0; i < strSize; i++) {
-		switch (str[i]) {
+int main() {
+	string str;
+	cin >> str;
+
+	char* cStr = new char[str.length() + 1];
+	strcpy(cStr, str.c_str());
+
+	for (int i = 0; i < str.length(); i++) {
+		int calc = 0;
+		int pre = 0;
+		switch (cStr[i]) {
 		case '*':
-			tmp = stk.top() * 2;
+			calc = stk.top() * 2;
 			stk.pop();
 			if (!stk.empty()) {
 				pre = stk.top() * 2;
 				stk.pop();
 				stk.push(pre);
 			}
-			stk.push(tmp);
+			stk.push(calc);
 			break;
 
 		case '#':
-			tmp = stk.top() * (-1);
+			calc = stk.top() * (-1);
 			stk.pop();
-			stk.push(tmp);
+			stk.push(calc);
 			break;
-
+		
 		case 'S':
-			tmp = pow(stk.top(), 1);
+			calc = pow(stk.top(), 1);
 			stk.pop();
-			stk.push(tmp);
+			stk.push(calc);
 			break;
 
 		case 'D':
-			tmp = pow(stk.top(), 2);
+			calc = pow(stk.top(), 2);
 			stk.pop();
-			stk.push(tmp);
+			stk.push(calc);
 			break;
 
 		case 'T':
-			tmp = pow(stk.top(), 3);
+			calc = pow(stk.top(), 3);
 			stk.pop();
-			stk.push(tmp);
+			stk.push(calc);
 			break;
 
 		case '0':
-			if (!stk.empty()) {
+			if (stk.top() == 1) {
 				stk.pop();
 				stk.push(10);
 			}
@@ -60,27 +77,14 @@ void strToken(char* str) {
 			break;
 
 		default:
-			tmp = str[i] - '0';
-			stk.push(tmp);
+			stk.push(cStr[i] - '0');
 		}
 	}
-}
-
-int main() {
-	string str;
-	cin >> str;
-	strSize = str.size();
-
-	char* cStr = new char[str.size() + 1];
-	strcpy(cStr, str.c_str());
-
-	strToken(cStr);
-
 	int res = 0;
-	while (!stk.empty()) {
+	while (!stk.empty()){
 		res += stk.top();
 		stk.pop();
 	}
-	printf("%d\n", res);
+	printf("%d", res);
 	return 0;
 }
