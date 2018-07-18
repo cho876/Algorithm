@@ -1,24 +1,29 @@
+/**
+	Test Case
+
+	5
+	9 20 28 18 11
+	30 1 21 17 28
+
+*/
+
 #include <iostream>
 #include <cstdio>
+#include <algorithm>
 #include <vector>
-
-#define MAX 17
 
 using namespace std;
 
-vector<int> bin1;
-vector<int> bin2;
+int n;
+
 vector<int> arr1;
 vector<int> arr2;
-
 vector<char> res;
-
-int n;
 
 vector<int> getBin(int decimal) {
 	vector<int> tmp;
-	tmp.resize(n);
-
+	tmp.assign(n, 0);
+	
 	int index = n-1;
 	while (decimal) {
 		tmp[index--] = decimal % 2;
@@ -27,8 +32,8 @@ vector<int> getBin(int decimal) {
 	return tmp;
 }
 
-void cmpBin(vector<int> bin1, vector<int> bin2) {
-	for (int i = 0; i < bin1.size(); i++) {
+void getRes(vector<int> bin1, vector<int> bin2) {
+	for (int i = 0; i < n; i++) {
 		if (bin1[i] == 1 || bin2[i] == 1)
 			res.push_back('#');
 		else
@@ -42,17 +47,18 @@ int main() {
 	int num;
 	for (int i = 0; i < n; i++) {
 		scanf("%d", &num);
-		arr1.push_back(num);
+		arr1.push_back(num);  // arr1 = [9, 20, 28, 18, 11]
 	}
 	for (int i = 0; i < n; i++) {
 		scanf("%d", &num);
-		arr2.push_back(num);
+		arr2.push_back(num);   // arr2 = [30, 1, 21, 17, 28]
 	}
 
 	for (int i = 0; i < n; i++) {
-		bin1 = getBin(arr1[i]);
-		bin2 = getBin(arr2[i]);
-		cmpBin(bin1, bin2);
+		vector<int> bin1 = getBin(arr1[i]);
+		vector<int> bin2 = getBin(arr2[i]);
+
+		getRes(bin1, bin2);
 	}
 
 	int cnt = 0;
