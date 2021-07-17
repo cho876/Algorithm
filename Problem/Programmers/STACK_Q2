@@ -1,0 +1,21 @@
+from collections import deque
+
+def solution(priorities, location):
+    answer = 0
+    lst = list([p,idx] for idx,p in enumerate(priorities))
+    
+    deq = deque(lst)
+    ans = []
+    
+    while deq:
+        curPriority = deq.popleft()
+        
+        if deq and curPriority[0] < max(deq)[0]: # 가장 큰 수라면
+            deq.append(curPriority)
+        else:
+            ans.append(curPriority)
+            answer += 1
+            if curPriority[1] == location:
+                break
+        
+    return answer
