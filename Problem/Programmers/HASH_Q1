@@ -1,0 +1,13 @@
+def solution(participant, completion):
+    answer = ''
+    
+    participant.sort()
+    completion.sort()
+    
+    lst = list([p,c] for p,c in zip(participant, completion))
+
+    for p,c in lst:
+        if p != c:
+            return p
+    
+    return participant[-1]
