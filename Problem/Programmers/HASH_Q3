@@ -1,0 +1,14 @@
+def solution(clothes):
+    answer = 1
+    dic = dict()
+    
+    for value,key in clothes:
+        if key in dic:
+            dic[key].append(value)
+        else:
+            dic[key] = [value]
+    
+    for key, value in dic.items():
+        answer *= (len(value)+1)
+        
+    return answer-1
