@@ -9,7 +9,7 @@ def solution(scoville, K):
     for data in scoville:
         heapq.heappush(heap, data)
 
-    while heap[0] < K:
+    while heap[0] < K: # data
         try:
             answer += 1
             heapq.heappush(heap, heapq.heappop(heap) + (heapq.heappop(heap) * 2))
