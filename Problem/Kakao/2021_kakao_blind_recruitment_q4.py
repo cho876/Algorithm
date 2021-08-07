@@ -1,49 +1,50 @@
-graph = [[]]
 INF = int(1e9)
+node = [[]]
+
+import heapq
 
 
-def makeNode(n, fares):
-    global graph
-
-    graph = [[] for _ in range(n + 1)]
+def makeNodes(fares):
+    global node
 
     for src, dst, cost in fares:
-        graph[src].append([dst, cost])
-        graph[dst].append([src, cost])
+        node[src].append([dst, cost])
+        node[dst].append([src, cost])
 
 
-def bfs(src, dst):
-    global graph
-    costArr = [INF] * len(graph)
+def dijkstra(src, dst):
+    global node
+    localCost = [INF] * (len(node))
+    localCost[src] = 0
 
-    costArr[src] = 0
-    route = [[src, 0]]
+    route = [[0, src]]
 
     while route:
-        curRoute, curCost = route.pop()
+        curCost, curRoute = heapq.heappop(route)
 
-        if curCost > costArr[curRoute]:
+        if curCost > localCost[curRoute]:
             continue
 
-        for nextRoute, nextCost in graph[curRoute]:
+        for nextRoute, nextCost in node[curRoute]:
             nextCost += curCost
 
-            if nextCost < costArr[nextRoute]:
-                costArr[nextRoute] = nextCost
-                route.append([nextRoute, nextCost])
-    return costArr[dst]
+            if nextCost < localCost[nextRoute]:
+                localCost[nextRoute] = nextCost
+                heapq.heappush(route, [nextCost, nextRoute])
+
+    return localCost[dst]
 
 
 def solution(n, s, a, b, fares):
-    global graph
-
+    global node
     answer = 0
-    makeNode(n, fares)
+    node = [[] for _ in range(n + 1)]
 
-    answer = bfs(s, a) + bfs(s, b)
+    makeNodes(fares)
+
+    answer = dijkstra(s, a) + dijkstra(s, b)
 
     for i in range(1, n + 1):
         if i != s:
-            answer = min(answer, bfs(s, i) + bfs(i, a) + bfs(i, b))
-
+            answer = min(answer, dijkstra(s, i) + dijkstra(i, a) + dijkstra(i, b))
     return answer
